@@ -48,6 +48,11 @@ const Hello = ({name, age}) => {
 }
 
 
+const Display = ({counter}) => <div>{counter}</div>
+
+const Button = ({handleClick, text}) => <button onClick={handleClick}>{text} </button>
+
+
 const App = (props) => {
   const course = {
     name: 'Half Stack application development',
@@ -72,16 +77,26 @@ const App = (props) => {
   
   const [ counter, setCounter ] = useState(0)
 
-  setTimeout(
-    () => setCounter(counter + 1),
-    1000
-  )
+  const increaseByOne = () => setCounter(counter + 1)
+  const decreaseByOne = () => setCounter(counter - 1)
+  const setToZero = () => setCounter(0)
 
-  console.log('rendering...', counter)
+  //console.log('rendering...', counter)
 
   return (
     <div>
-      {counter}
+      <Display counter={counter}/>
+      <Button handleClick = {increaseByOne}
+      text = 'plus'
+      />
+       <Button
+        handleClick={setToZero}
+        text='zero'
+      />     
+      <Button
+        handleClick={decreaseByOne}
+        text='minus'
+        />    
     </div>
   )
 }
