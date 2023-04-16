@@ -1,5 +1,6 @@
 import { useState } from 'react'
 
+// For 1a
 const Header = (props) => {
   console.log(props)
   return (
@@ -47,13 +48,15 @@ const Hello = ({name, age}) => {
   )
 }
 
-
+// For 1b
 const Display = ({counter}) => <div>{counter}</div>
 
 const Button = ({handleClick, text}) => <button onClick={handleClick}>{text} </button>
 
 
 const App = (props) => {
+
+  // For 1a
   const course = {
     name: 'Half Stack application development',
     parts: [
@@ -71,32 +74,37 @@ const App = (props) => {
       }
     ]
   }
-
   const name = 'Peter'
   const age = 10
   
-  const [ counter, setCounter ] = useState(0)
+  // 1c Component state
+  /*const [ counter, setCounter ] = useState(0)
 
   const increaseByOne = () => setCounter(counter + 1)
   const decreaseByOne = () => setCounter(counter - 1)
   const setToZero = () => setCounter(0)
+  */
 
-  //console.log('rendering...', counter)
+  // 1d More complex state
+  const [clicks, setClicks] = useState({
+    left: 0, right: 0
+  })
+
+  const handleLeftClick = () => {
+    setClicks({ ...clicks, left: clicks.left + 1})
+  }
+
+  const handleRightClick = () => 
+  {
+    setClicks({ ...clicks, right: clicks.right + 1})
+  }
 
   return (
     <div>
-      <Display counter={counter}/>
-      <Button handleClick = {increaseByOne}
-      text = 'plus'
-      />
-       <Button
-        handleClick={setToZero}
-        text='zero'
-      />     
-      <Button
-        handleClick={decreaseByOne}
-        text='minus'
-        />    
+      {clicks.left}
+      <button onClick={handleLeftClick}>left</button>
+      <button onClick={handleRightClick}>right</button>
+      {clicks.right}
     </div>
   )
 }
