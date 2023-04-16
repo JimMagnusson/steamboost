@@ -69,6 +69,37 @@ const History = (props) => {
   )
 }
 
+const Statistics = (props) => {
+  console.log(props)
+  if(props.good + props.neutral + props.bad > 0) {
+    return(
+      <div>
+        <StastisticLine text ="good" value = {props.good}></StastisticLine>
+        <StastisticLine text ="neutral" value = {props.neutral}></StastisticLine>
+        <StastisticLine text ="neutral" value = {props.bad}></StastisticLine>
+        <StastisticLine text ="bad" value = {props.all}></StastisticLine>
+        <StastisticLine text ="average" value = {props.average}></StastisticLine>
+        <StastisticLine text ="positive" value = {props.positive * 100 + ' %'}></StastisticLine>
+      </div>
+      )
+  }
+  else {
+    return (
+      <div>
+      <p>No feedback given</p>
+    </div>
+    )
+  }
+}
+
+const StastisticLine = (props) => {
+  return(
+    <div>
+      <p>{props.text} {props.value}</p>
+    </div>
+  )
+}
+
 const App = (props) => {
 
   // For 1a
@@ -119,14 +150,45 @@ const App = (props) => {
     setRight(updatedRigth)
     setTotal(left + updatedRigth)
   }
+  // save clicks of each button to its own state
+  const [good, setGood] = useState(0)
+  const [neutral, setNeutral] = useState(0)
+  const [bad, setBad] = useState(0)
+
+  const handleGoodReview = () => {
+    const updatedGood = good + 1
+    setGood(updatedGood)
+  }
+
+  const handleNeutralReview = () => {
+    const updatedNeutral = neutral + 1
+    setNeutral(updatedNeutral)
+  }
+
+  const handleBadReview = () => {
+    const updatedBad = bad + 1
+    setBad(updatedBad)
+  }
+
+  const getReviewCount = () => good + neutral + bad
+  
+  const getAverage = () => (good - bad)/getReviewCount()
+
+  const getPositivePercentage = () => good/getReviewCount()
 
   return (
     <div>
-      {left}
-      <Button handleClick={handleLeftClick} text='left' />
-      <Button handleClick={handleRightClick} text='right' />
-      {right}
-      <History allClicks={allClicks} />
+      <h1>
+        give feedback
+      </h1>
+      <Button handleClick={handleGoodReview} text="good" />
+      <Button handleClick={handleNeutralReview} text="neutral" />
+      <Button handleClick={handleBadReview} text="bad" />
+      <h1> 
+        statistics
+      </h1>
+      <Statistics good = {good} neutral = {neutral} bad = {bad} all = {getReviewCount()} average = {getAverage()} positive = {getPositivePercentage()}></Statistics>
+      
     </div>
   )
 }
