@@ -40,11 +40,31 @@ const App = () => {
         setNewName('')
         setNewNumber('')
       })
+      .catch(error => {
+        console.log('fail')
+      })
     }
     else {
       alert(`${newName} is already in the phonebook`)
     }
   }
+
+  const removePerson = (id, event) => {
+    event.preventDefault()
+    const found = persons.find(element => id === element.id);
+    if (window.confirm(`Delete ${found.name}?`)) {
+      personService
+      .remove(id)
+      .then(() => {
+        const remainingPersons = persons.filter(n => n.id !== id)
+        setPersons(remainingPersons)
+      })
+      .catch(error => {
+        console.log('fail')
+      })
+    }
+  }
+
 
   const handleNameChange = (event) => {
     setNewName(event.target.value)
@@ -82,7 +102,7 @@ const App = () => {
 
       <h2>Numbers</h2>
 
-      <Persons persons = {personsToShow}/>
+      <Persons persons = {personsToShow} removePerson = {removePerson}/>
 
     </div>
   )
