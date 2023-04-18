@@ -4,6 +4,7 @@ import PersonForm from "./components/PersonForm"
 import Persons from "./components/Persons"
 import Filter from "./components/Filter"
 import axios from "axios"
+import personService from './services/persons'
 
 
 const App = () => {
@@ -13,19 +14,32 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
 
+  useEffect(() => {
+    console.log('effect')
+    personService
+    .getAll()
+    .then(initialPersons => {
+      setPersons(initialPersons)
+    })
+  }, [])
+
   const addPerson = (event) => {
     event.preventDefault()
 
     const found = persons.find(element => newName === element.name);
     if(found === undefined) {
-      const entryObject = {
+      const personObject = {
         name: newName,
         number: newNumber,
         id: persons.length + 1
       }
-      setPersons(persons.concat(entryObject))
-      setNewName('')
-      setNewNumber('')
+      personService
+      .create(personObject)
+      .then(returnedPerson => {
+        setPersons(persons.concat(returnedPerson))
+        setNewName('')
+        setNewNumber('')
+      })
     }
     else {
       alert(`${newName} is already in the phonebook`)
@@ -47,17 +61,6 @@ const App = () => {
   const personsToShow = (filter === '')
     ? persons
     : persons.filter(word => word.name.toLowerCase().indexOf(filter) > -1)
-
-
-  useEffect(() => {
-    console.log('effect')
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        console.log('promise fulfilled')
-        setPersons(response.data)
-      })
-  }, [])
 
   return (
     <div>
