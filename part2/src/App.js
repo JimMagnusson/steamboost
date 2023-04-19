@@ -1,3 +1,4 @@
+// Made from tutorial at https://fullstackopen.com
 import React, { useEffect } from "react"
 import { useState } from 'react'
 import PersonForm from "./components/PersonForm"
@@ -6,22 +7,75 @@ import Filter from "./components/Filter"
 import axios from "axios"
 import personService from './services/persons'
 
+const Footer = () => {
+  const footerStyle = {
+    color: 'green',
+    fontStyle: 'italic',
+    fontSize: 16
+  }
+  return (
+    <div style={footerStyle}>
+      <br />
+      <em>Note app, Department of Computer Science, University of Helsinki 2022</em>
+    </div>
+  )
+}
+
+const ErrorNotification = ({ message }) => {
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div className='error'>
+      {message}
+    </div>
+  )
+}
+
+const Notification = ({ message }) => {
+  const notificationStyle = {
+    color: 'green',
+    fontSize: 20,
+    background: 'lightgrey',
+    borderStyle: 'solid',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
+  }
+
+  if (message === '') {
+    return null
+  }
+
+  return (
+    <div style={notificationStyle}>
+      {message}
+    </div>
+  )
+}
 
 const App = () => {
 
-  const [persons, setPersons] = useState([])
+  const [persons, setPersons] = useState(null)
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
+  const [errorMessage, setErrorMessage] = useState('some error happened...')
+  const [notificationMessage, setNotificationMessage] = useState('')
 
   useEffect(() => {
-    console.log('effect')
     personService
     .getAll()
     .then(initialPersons => {
       setPersons(initialPersons)
     })
   }, [])
+
+
+  if(!persons) {
+    return null
+  }
 
   const addPerson = (event) => {
     event.preventDefault()
@@ -39,6 +93,11 @@ const App = () => {
         setPersons(persons.concat(returnedPerson))
         setNewName('')
         setNewNumber('')
+
+        setNotificationMessage("Added " + returnedPerson.name )
+        setTimeout(() => {
+          setNotificationMessage('')
+        }, 3000)
       })
       .catch(error => {
         console.log('fail')
@@ -81,11 +140,10 @@ const App = () => {
   const personsToShow = (filter === '')
     ? persons
     : persons.filter(word => word.name.toLowerCase().indexOf(filter) > -1)
-
   return (
     <div>
-      <h2>Phonebook</h2>
-
+      <h1 className = 'test'>Phonebook</h1>
+      <Notification message={notificationMessage} />
       <Filter 
         addPerson = {addPerson}
         filter = {filter} 
@@ -104,6 +162,7 @@ const App = () => {
 
       <Persons persons = {personsToShow} removePerson = {removePerson}/>
 
+    <Footer />
     </div>
   )
 }
