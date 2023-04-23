@@ -1,47 +1,33 @@
 import { useState } from 'react'
-import axios from 'axios'
 import React from 'react'
+import {
+  BrowserRouter as Router,
+  Routes, Route, Link
+} from 'react-router-dom'
+import Home from "./components/Home"
+import ShortDescriptionGenerator from "./components/ShortDescriptionGenerator"
 
-const baseUrl = 'http://localhost:3001/generate-short-description'
 
 const App = () => {
-  const [keywords, setKeywords] = useState('')
-  const [shortDescription, setshortDescription] = useState('')
-
-
-  const handleSendKeywords = (event) => {
-    event.preventDefault()
-    const lowerCaseKeywords = keywords.toLowerCase()
-    console.log(lowerCaseKeywords)
-    const keywordsObject = {
-      description: lowerCaseKeywords
-    }
-    axios
-    .post(baseUrl, keywordsObject)
-    .then(response => {
-      console.log('promise fulfilled')
-      setshortDescription(response.data)
-    })
-    .catch(error => console.error(error));
+  const padding = {
+    padding: 5
   }
-
-  const handleKeywordChange = (event) => {
-    setKeywords(event.target.value)
-  }
-
+  
   return (
-  <div>
-    <p>Hello world</p>
-    <form onSubmit={handleSendKeywords}>
-        <input
-          type="text"
-          value={keywords}
-          onChange={handleKeywordChange}
-        />
-        <button type="submit">Submit</button>
-      </form>
-    <p>{shortDescription}</p>
-  </div>
+  <Router>
+    <div>
+      <Link style={padding} to="/">home</Link>
+      <Link style={padding} to="/short-description-generator">Short Description Generator</Link>
+    </div>
+
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/short-description-generator" element={<ShortDescriptionGenerator/>
+      } />
+    </Routes>
+    
+  </Router>
+
   )
 }
 
