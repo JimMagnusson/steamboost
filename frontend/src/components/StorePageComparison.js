@@ -4,6 +4,7 @@ import getStorePageDetails from '../services/steamAPIService'
 import { ReactSearchAutocomplete } from 'react-search-autocomplete'
 import steamAPIService from '../services/steamAPIService'
 import GameList from '../components/GameList'
+import shortDescriptions from '../services/shortDescriptions'
 
 const steamGames = [
     {
@@ -91,22 +92,22 @@ const StorePageComparison = (props) => {
         steamAPIService
         .getStorePageDetails(results[i].appid)
         .then(steamGame => {
-            //console.log(steamGame)
-    
-            // TODO: display image in formatResults
             if(steamGame != undefined) {
+              // Will show up in search bar suggestions
               const suggestionObject = {
                 name: steamGame.name,
-                headerImage: steamGame.header_image
+                headerImage: steamGame.header_image,
+                tags: steamGame.genres.map(game => game.description),
+                shortDescription: steamGame.short_description
               }
 
               // Update suggestions state
               setSuggestions(prevState => {
-                // Add the new data to the beginning of the array
+                // Add the new data to the the array
                 const newSuggestions = [...prevState, suggestionObject]
 
                 if(newSuggestions.length > SUGGESTIONS_LIMIT) {
-                  return newSuggestions.slice(1);
+                  return newSuggestions.slice(1); // Remove old data
                 }
 
                 return newSuggestions
@@ -128,8 +129,18 @@ const StorePageComparison = (props) => {
 
   const handleOnSelect = (item) => {
     // Add to selected games list
-    const selectedGame = suggestions.find((suggestion) => suggestion.name == item.name)
-    setSelectedGames(selectedGames.concat(selectedGame))
+    const selectedSuggestion = suggestions.find((suggestion) => suggestion.name == item.name)
+
+    const selectedGameObject = {
+      id: selectedGames.length + 1,
+      image: selectedSuggestion.headerImage,
+      title: selectedSuggestion.name,
+      tags: selectedSuggestion.tags,
+      description: selectedSuggestion.shortDescription
+    }
+    setSelectedGames(selectedGames.concat(selectedGameObject))
+    // Reset search variable
+
   }
 
   const handleOnFocus = () => {
@@ -143,8 +154,6 @@ const StorePageComparison = (props) => {
 
   const formatResult = (item) => {
     const result = suggestions.find((suggestion) => suggestion.name == item.name)
-    //console.log(result)
-    //        <img src={result.headerImage} alt="Trees" height="200" />
     return (
       <div>
         <span> { result != undefined &&
@@ -180,7 +189,7 @@ const StorePageComparison = (props) => {
             autoFocus
           />
           <div className="App">
-            <GameList games = {games}/>
+            <GameList games = {selectedGames}/>
           </div>
     </div>
   )
