@@ -24,52 +24,59 @@ const steamGames = [
   ];
 
 let steamGamesTest = [    {
-  name: "Valheim",
-  appID: 892970
-},
+    name: "Valheim",
+    appID: 892970
+  },
 
-{
-  name: "Baldurs Gate 3",
-  appID: 1086940
-},
+  {
+    name: "Baldurs Gate 3",
+    appID: 1086940
+  },
 ]
 
 const StorePageComparison = (props) => {
-  //const [searchTerm, setSearchTerm] = useState('')
-  //const [suggestions, setSuggestions] = useState([]);
   const [selectedGames, setSelectedGames] = useState([]);
   const [allGames, setAllGames] = useState([]);
+  const [suggestions, setSuggestions] = useState([]);
+
+  const SUGGESTIONS_LIMIT = 10;
 
   const handleOnSearch = (string, results) => {
     // onSearch will have as the first callback parameter
     // the string searched and for the second the results.
     
     // Ide: 
-    
-    // Load array of all steam games during initialization.
-    // Assume above can be done.
-
-    // Contains names and their appid
-    // use this array for the searchbar as the items array.
-
-
     // Result of fuzzy search set in results. 
+    if(results.length > 0){
+      for(let i = 0; i < results.length; i++)
+        steamAPIService
+        .getStorePageDetails(results[i].appid)
+        .then(steamGame => {
+            //console.log(steamGame)
+    
+            // TODO: display image in formatResults
+            if(steamGame != undefined) {
+              const suggestionObject = {
+                name: steamGame.name,
+                headerImage: steamGame.header_image
+              }
 
-    // Take these appids and do API call on all of them
+              // Update suggestions state
+              setSuggestions(prevState => {
+                // Add the new data to the beginning of the array
+                const newSuggestions = [...prevState, suggestionObject]
 
-    // TODO: loop over all results
+                if(newSuggestions.length > SUGGESTIONS_LIMIT) {
+                  return newSuggestions.slice(1);
+                }
 
-    // TODO: FIX CORS PROBLEM
-    if(results[0] != undefined  && results[0].appID != undefined) {
-      steamAPIService
-      .getStorePageDetails(results[0].appID)
-      .then(steamGame => {
-          console.log(steamGame)
-          // TODO: get image from steamGame.header_image
-  
-          // TODO: display image in formatResults
-      })
+                return newSuggestions
+              }
+              )
+            }
+        })
     }
+    
     
     // Show icon and name in the search bar by updating some state variables
 
@@ -77,6 +84,7 @@ const StorePageComparison = (props) => {
 
     //setSuggestions(suggestions);
   }
+
 
   const handleOnHover = (result) => {
     // the item hovered
@@ -97,11 +105,16 @@ const StorePageComparison = (props) => {
   }
 
   const formatResult = (item) => {
+    const result = suggestions.find((suggestion) => suggestion.name == item.name)
+    //console.log(result)
+    //        <img src={result.headerImage} alt="Trees" height="200" />
     return (
-      <>
-        <span style={{ display: 'block', textAlign: 'left' }}>id: {item.appid}</span>
-        <span style={{ display: 'block', textAlign: 'left' }}>name: {item.name}</span>
-      </>
+      <div>
+        <span> { result != undefined &&
+          <img src={result.headerImage} alt="Trees" height="80" />
+          }
+          {item.name}</span>
+      </div>
     )
   }
 
@@ -131,7 +144,11 @@ const StorePageComparison = (props) => {
 
         <ul>
         {selectedGames.map((item, index) => (
-            <li key={index}>{item}</li>
+            <li key={index}>
+              {item.name}
+              <img src={item.headerImage} alt="Trees" height="200" />
+            </li>
+            
         ))}
         </ul>
     </div>
