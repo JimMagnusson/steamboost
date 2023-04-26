@@ -20,7 +20,7 @@ app.get('/', (request, response) => {
 
 app.post("/generate-short-description", async (request, response) => {
     const body = request.body
-    const promt = "Can you give a suggestion for a short description for a Steam store page where the game is about " + body.description
+    const promt = "Can you give a suggestion for a short description for a Steam store page where the game is about " + body.description + "."
     const completion = await openai.createChatCompletion({
       model: "gpt-3.5-turbo",
       messages: [

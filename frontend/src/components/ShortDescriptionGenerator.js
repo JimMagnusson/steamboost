@@ -28,6 +28,7 @@ const ShortDescriptionGenerator = (props) => {
 
   return (
     <div>
+      <p>Enter what your game is about:</p>
       <form onSubmit={handleSendKeywords}>
         <input
           type="text"

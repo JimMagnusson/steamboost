@@ -1,8 +1,20 @@
 import React from "react"
 
+
+
 const Home = () => {
+  const homeStyle = {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    height: "100%"
+  }
     return (
-      <h1>Home</h1>
+      <div>
+        <h1 style={homeStyle}>Steam Boost</h1>
+        <p style={homeStyle}>Home page</p>
+      </div>
+
     )
   }
   
