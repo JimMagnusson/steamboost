@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import React from "react"
+import React, { useEffect } from "react"
 import getStorePageDetails from '../services/steamAPIService'
 import { ReactSearchAutocomplete } from 'react-search-autocomplete'
 import steamAPIService from '../services/steamAPIService'
@@ -20,22 +20,30 @@ const steamGames = [
       name: "Dota 2",
       appID: 570
     },
-    {
-      id: 3,
-      name: "Half-Life 2",
-      appID: 220
-    },
+
   ];
 
+let steamGamesTest = [    {
+  name: "Valheim",
+  appID: 892970
+},
+
+{
+  name: "Baldurs Gate 3",
+  appID: 1086940
+},
+]
+
 const StorePageComparison = (props) => {
-  const [searchTerm, setSearchTerm] = useState('')
-  const [suggestions, setSuggestions] = useState([]);
+  //const [searchTerm, setSearchTerm] = useState('')
+  //const [suggestions, setSuggestions] = useState([]);
   const [selectedGames, setSelectedGames] = useState([]);
+  const [allGames, setAllGames] = useState([]);
 
   const handleOnSearch = (string, results) => {
     // onSearch will have as the first callback parameter
     // the string searched and for the second the results.
-    console.log(string, results)
+    
     // Ide: 
     
     // Load array of all steam games during initialization.
@@ -52,16 +60,17 @@ const StorePageComparison = (props) => {
     // TODO: loop over all results
 
     // TODO: FIX CORS PROBLEM
-    steamAPIService
-    .getStorePageDetails(results[0].appID)
-    .then(steamGame => {
-        console.log(steamGame)
-        console.log("Name " + steamGame.name)
-
-        // TODO: get image from steamGame.header_image
-
-        // TODO: display image in formatResults
-    })
+    if(results[0] != undefined  && results[0].appID != undefined) {
+      steamAPIService
+      .getStorePageDetails(results[0].appID)
+      .then(steamGame => {
+          console.log(steamGame)
+          // TODO: get image from steamGame.header_image
+  
+          // TODO: display image in formatResults
+      })
+    }
+    
     // Show icon and name in the search bar by updating some state variables
 
 
@@ -90,24 +99,31 @@ const StorePageComparison = (props) => {
   const formatResult = (item) => {
     return (
       <>
-        <span style={{ display: 'block', textAlign: 'left' }}>id: {item.id}</span>
+        <span style={{ display: 'block', textAlign: 'left' }}>id: {item.appid}</span>
         <span style={{ display: 'block', textAlign: 'left' }}>name: {item.name}</span>
       </>
     )
   }
+
+  useEffect(() => {
+    steamAPIService
+    .getAllApps()
+    .then(games => {
+      games = games.map((item, index) => ({ ...item, id: index + 1 })) // Add index field to all elements. Errors pop up otherwise.
+      setAllGames(games)
+    })
+  }, [])
   
 
   return (
     <div>
       <h2>Steam Store Page Comparison</h2>
         <div style={{ marginBottom: 20 }}>Search for Steam Game:</div>
+
           <ReactSearchAutocomplete
-            items={steamGames}
+            items={allGames}
             onSearch={handleOnSearch}
-            onHover={handleOnHover}
             onSelect={handleOnSelect}
-            onFocus={handleOnFocus}
-            onClear={handleOnClear}
             styling={{ zIndex: 1 }}
             formatResult={formatResult}
             autoFocus
