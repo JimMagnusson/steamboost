@@ -3,6 +3,7 @@ import React, { useEffect } from "react"
 import getStorePageDetails from '../services/steamAPIService'
 import { ReactSearchAutocomplete } from 'react-search-autocomplete'
 import steamAPIService from '../services/steamAPIService'
+import GameList from '../components/GameList'
 
 const steamGames = [
     {
@@ -23,16 +24,54 @@ const steamGames = [
 
   ];
 
-let steamGamesTest = [    {
+const steamGamesTest = [    
+  {
     name: "Valheim",
     appID: 892970
   },
-
   {
     name: "Baldurs Gate 3",
     appID: 1086940
   },
 ]
+
+const games = [
+  {
+    id: 1,
+    image: 'game1.jpg',
+    title: 'Game 1',
+    tags: ['Action'],
+    description: 'Description.'
+  },
+  {
+    id: 2,
+    image: 'game2.jpg',
+    title: 'Game 2',
+    tags: ['RPG', 'Fantasy'],
+    description: 'Description'
+  },
+  {
+    id: 3,
+    image: 'game3.jpg',
+    title: 'Game 3',
+    tags: ['Shooter'],
+    description: 'Description'
+  },
+  {
+    id: 4,
+    image: 'game4.jpg',
+    title: 'Game 4',
+    tags: ['Strategy'],
+    description: 'Description'
+  },
+  {
+    id: 5,
+    image: 'game5.jpg',
+    title: 'Game 5',
+    tags: ['Strategy'],
+    description: 'Description'
+  }
+];
 
 const StorePageComparison = (props) => {
   const [selectedGames, setSelectedGames] = useState([]);
@@ -79,10 +118,6 @@ const StorePageComparison = (props) => {
     
     
     // Show icon and name in the search bar by updating some state variables
-
-
-
-    //setSuggestions(suggestions);
   }
 
 
@@ -92,8 +127,9 @@ const StorePageComparison = (props) => {
   }
 
   const handleOnSelect = (item) => {
-    // the item selected
-    //console.log(item)
+    // Add to selected games list
+    const selectedGame = suggestions.find((suggestion) => suggestion.name == item.name)
+    setSelectedGames(selectedGames.concat(selectedGame))
   }
 
   const handleOnFocus = () => {
@@ -102,6 +138,7 @@ const StorePageComparison = (props) => {
 
   const handleOnClear = () => {
     //console.log('Focused')
+
   }
 
   const formatResult = (item) => {
@@ -122,7 +159,8 @@ const StorePageComparison = (props) => {
     steamAPIService
     .getAllApps()
     .then(games => {
-      games = games.map((item, index) => ({ ...item, id: index + 1 })) // Add index field to all elements. Errors pop up otherwise.
+      // Add index field to all elements. Errors pop up otherwise.
+      games = games.map((item, index) => ({ ...item, id: index + 1 })) 
       setAllGames(games)
     })
   }, [])
@@ -141,16 +179,9 @@ const StorePageComparison = (props) => {
             formatResult={formatResult}
             autoFocus
           />
-
-        <ul>
-        {selectedGames.map((item, index) => (
-            <li key={index}>
-              {item.name}
-              <img src={item.headerImage} alt="Trees" height="200" />
-            </li>
-            
-        ))}
-        </ul>
+          <div className="App">
+            <GameList games = {games}/>
+          </div>
     </div>
   )
 }

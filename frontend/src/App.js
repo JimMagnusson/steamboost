@@ -5,8 +5,8 @@ import {
   Routes, Route, Link
 } from 'react-router-dom'
 import Home from "./components/Home"
-import ShortDescriptionGenerator from "./components/ShortDescriptionGenerator"
 import StorePageComparison from "./components/StorePageComparison"
+import ShortDescriptionGenerator from "./components/ShortDescriptionGenerator"
 
 const App = () => {
   const padding = {
@@ -17,14 +17,14 @@ const App = () => {
   <Router>
     <div>
       <Link style={padding} to="/">home</Link>
-      <Link style={padding} to="/short-description-generator">Short Description Generator</Link>
       <Link style={padding} to="/store-page-comparison">Store Page Comparison</Link>
+      <Link style={padding} to="/short-description-generator">Short Description Generator</Link>
     </div>
 
     <Routes>
       <Route path="/" element={<Home />} />
-      <Route path="/short-description-generator" element={<ShortDescriptionGenerator />} />
       <Route path="/store-page-comparison" element={<StorePageComparison/>} />
+      <Route path="/short-description-generator" element={<ShortDescriptionGenerator />} />
     </Routes>
     
   </Router>
