@@ -98,7 +98,8 @@ const StorePageComparison = (props) => {
                 name: steamGame.name,
                 headerImage: steamGame.header_image,
                 tags: steamGame.genres.map(game => game.description),
-                shortDescription: steamGame.short_description
+                shortDescription: steamGame.short_description,
+                id: steamGame.steam_appid
               }
 
               // Update suggestions state
@@ -132,7 +133,7 @@ const StorePageComparison = (props) => {
     const selectedSuggestion = suggestions.find((suggestion) => suggestion.name == item.name)
 
     const selectedGameObject = {
-      id: selectedGames.length + 1,
+      id: selectedSuggestion.id,
       image: selectedSuggestion.headerImage,
       title: selectedSuggestion.name,
       tags: selectedSuggestion.tags,
@@ -174,6 +175,11 @@ const StorePageComparison = (props) => {
     })
   }, [])
   
+  function handleOnRemoveClick(gameTitle) {
+    const newSelectedGames = selectedGames.filter((item) => gameTitle !== item.title)
+    setSelectedGames(newSelectedGames)
+  }
+
 
   return (
     <div>
@@ -189,7 +195,7 @@ const StorePageComparison = (props) => {
             autoFocus
           />
           <div className="App">
-            <GameList games = {selectedGames}/>
+            <GameList games = {selectedGames} onRemoveClick={handleOnRemoveClick}/>
           </div>
     </div>
   )
