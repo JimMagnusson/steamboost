@@ -1,3 +1,6 @@
+import { Carousel } from 'react-responsive-carousel';
+import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
+
 const styles = {
     gameCard: {
       display: 'flex',
@@ -47,12 +50,20 @@ function GameCard({ game, onRemoveClick }) {
     onRemoveClick(game.title)
   }
 
+  const sliderSettings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+  };
+
 
   return (
     <div style={styles.gameCard}>
       <div style={styles.imageContainer}>
         <img src={game.image} alt={game.title} style={styles.gameImage} />
-        <button style={styles.imageButton} onClick = {handleRemoveClick}>X</button>
+        <button style={styles.imageButton} onClick={handleRemoveClick}>X</button>
       </div>
       <div style={styles.gameDetails}>
         <h2 style={styles.gameTitle}>{game.title}</h2>
@@ -63,6 +74,13 @@ function GameCard({ game, onRemoveClick }) {
         </div>
         <p>{game.description}</p>
       </div>
+      <Carousel showStatus={false} infiniteLoop={true} autoPlay={false} >
+      {game.screenshots.map((screenshot, index) => (
+            <div key={index}>
+              <img src={screenshot} alt={game.title} style={styles.gameImage} />
+            </div>
+          ))}
+      </Carousel>
     </div>
   );
 }
