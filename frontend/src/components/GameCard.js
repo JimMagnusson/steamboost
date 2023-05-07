@@ -1,5 +1,6 @@
 import { Carousel } from 'react-responsive-carousel';
-import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
+import "react-responsive-carousel/lib/styles/carousel.min.css";
+import ReactPlayer from "react-player";
 
 const styles = {
     gameCard: {
@@ -58,6 +59,40 @@ function GameCard({ game, onRemoveClick }) {
     slidesToScroll: 1,
   };
 
+  const screenshots = game.screenshots.map((src) => ({
+    src,
+    alt: "Screenshot",
+    type: "image",
+  }));
+
+  const videos = game.videos.map(item =>  ({
+    src: item.src,
+    alt: "Video",
+    type: "video",
+    thumbnail: item.thumbnail
+  }));
+
+  // First two items in the carousel are videos (if there are any)
+  //const n = (videos.length > 2) ? 2 : videos.length 
+  const firstVideos = (videos.length <= 2) ? videos : videos.slice(0,2)
+  const lastVideos = (videos.length <= 2) ? [] : videos.slice(2,videos.length)
+
+
+
+  const carouselItems = [...firstVideos, ...screenshots, ...lastVideos]
+
+  // Need to adjust renderThumbs to make video thumbnails appear in the carousel thumbnails.
+  const renderThumbs = () => {
+    return carouselItems.map((item, index) => (
+      <div key={index}>
+        {item.type === 'image' ? (
+          <img src={item.src} alt={item.alt} />
+        ) : (
+          <img src={item.thumbnail} alt={item.alt} />
+        )}
+      </div>
+    ));
+  };
 
   return (
     <div style={styles.gameCard}>
@@ -74,12 +109,18 @@ function GameCard({ game, onRemoveClick }) {
         </div>
         <p>{game.description}</p>
       </div>
-      <Carousel showStatus={false} infiniteLoop={true} autoPlay={false} >
-      {game.screenshots.map((screenshot, index) => (
-            <div key={index}>
-              <img src={screenshot} alt={game.title} style={styles.gameImage} />
-            </div>
-          ))}
+
+      <Carousel showStatus={false} infiniteLoop={true} autoPlay={false} renderThumbs={renderThumbs} >
+        {carouselItems.map((item, index) => (
+        <div key={index}>
+          {item.type === "image" ? (
+            <img src={item.src} alt={item.alt} />
+          ) : (
+            <ReactPlayer url={item.src} width="100%" height="100%" controls={true} />
+            //<img src={item.thumbnail} alt={item.alt} />
+          )}
+        </div>
+        ))}
       </Carousel>
     </div>
   );

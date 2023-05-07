@@ -95,12 +95,19 @@ const StorePageComparison = (props) => {
             if(steamGame != undefined) {
               //console.log(steamGame.screenshots[0].path_thumbnail)
               // Will show up in search bar suggestions
+
+              const videos = steamGame.movies.map(item => ({
+                src: item.mp4['480'],
+                thumbnail: item.thumbnail,
+              }))
+
               const suggestionObject = {
                 name: steamGame.name,
                 headerImage: steamGame.header_image,
                 tags: steamGame.genres.map(game => game.description),
                 shortDescription: steamGame.short_description,
                 screenshots: steamGame.screenshots.map(item => item.path_thumbnail),
+                videos: videos,
                 id: steamGame.steam_appid
               }
 
@@ -140,6 +147,7 @@ const StorePageComparison = (props) => {
       title: selectedSuggestion.name,
       tags: selectedSuggestion.tags,
       screenshots: selectedSuggestion.screenshots,
+      videos: selectedSuggestion.videos,
       description: selectedSuggestion.shortDescription
     }
     setSelectedGames(selectedGames.concat(selectedGameObject))
