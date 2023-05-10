@@ -1,10 +1,9 @@
 import { useState } from 'react'
 import React, { useEffect } from "react"
-import getStorePageDetails from '../services/steamAPIService'
 import { ReactSearchAutocomplete } from 'react-search-autocomplete'
 import steamAPIService from '../services/steamAPIService'
+import steamSpyAPIService from '../services/steamSpyAPIService'
 import GameList from '../components/GameList'
-import shortDescriptions from '../services/shortDescriptions'
 
 const steamGames = [
     {
@@ -93,8 +92,6 @@ const StorePageComparison = (props) => {
         .getStorePageDetails(results[i].appid)
         .then(steamGame => {
             if(steamGame != undefined) {
-              //console.log(steamGame.screenshots[0].path_thumbnail)
-              // Will show up in search bar suggestions
 
               const videos = steamGame.movies.map(item => ({
                 src: item.mp4['480'],
@@ -104,7 +101,6 @@ const StorePageComparison = (props) => {
               const suggestionObject = {
                 name: steamGame.name,
                 headerImage: steamGame.header_image,
-                tags: steamGame.genres.map(game => game.description),
                 shortDescription: steamGame.short_description,
                 screenshots: steamGame.screenshots.map(item => item.path_thumbnail),
                 videos: videos,
@@ -141,17 +137,29 @@ const StorePageComparison = (props) => {
     // Add to selected games list
     const selectedSuggestion = suggestions.find((suggestion) => suggestion.name == item.name)
 
-    const selectedGameObject = {
+    let selectedGameObject = {
       id: selectedSuggestion.id,
       image: selectedSuggestion.headerImage,
       title: selectedSuggestion.name,
-      tags: selectedSuggestion.tags,
       screenshots: selectedSuggestion.screenshots,
       videos: selectedSuggestion.videos,
-      description: selectedSuggestion.shortDescription
+      description: selectedSuggestion.shortDescription,
+      tags: []
     }
-    setSelectedGames(selectedGames.concat(selectedGameObject))
-    // Reset search variable
+
+    // API call to SteamSpy to get user defined tags
+    steamSpyAPIService.getTags(selectedSuggestion.id)
+    .then(tags => {
+        if(tags != undefined) {
+          const keys = Object.keys(tags);
+          selectedGameObject.tags = keys;
+          setSelectedGames(selectedGames.concat(selectedGameObject))
+        }
+        
+        
+    })
+    
+    // TODO: Reset search variable
 
   }
 

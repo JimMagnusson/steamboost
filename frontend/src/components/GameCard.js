@@ -72,7 +72,7 @@ function GameCard({ game, onRemoveClick }) {
     thumbnail: item.thumbnail
   }));
 
-  // First two items in the carousel are videos (if there are any)
+  // First two items in the carousel are videos (if there are any), rest of videos is put at the end
   //const n = (videos.length > 2) ? 2 : videos.length 
   const firstVideos = (videos.length <= 2) ? videos : videos.slice(0,2)
   const lastVideos = (videos.length <= 2) ? [] : videos.slice(2,videos.length)
@@ -82,7 +82,7 @@ function GameCard({ game, onRemoveClick }) {
   const carouselItems = [...firstVideos, ...screenshots, ...lastVideos]
 
   // Need to adjust renderThumbs to make video thumbnails appear in the carousel thumbnails.
-  const renderThumbs = () => {
+  const customRenderThumbs = () => {
     return carouselItems.map((item, index) => (
       <div key={index}>
         {item.type === 'image' ? (
@@ -94,6 +94,8 @@ function GameCard({ game, onRemoveClick }) {
     ));
   };
 
+  const slicedTags = game.tags.slice(0,4) // only show first 4 tags
+
   return (
     <div style={styles.gameCard}>
       <div style={styles.imageContainer}>
@@ -103,21 +105,20 @@ function GameCard({ game, onRemoveClick }) {
       <div style={styles.gameDetails}>
         <h2 style={styles.gameTitle}>{game.title}</h2>
         <div style={styles.gameTags}>
-          {game.tags.map(tag => (
+          {slicedTags.map(tag => (
             <span key={tag} style={styles.gameTag}>{tag}</span>
           ))}
         </div>
         <p>{game.description}</p>
       </div>
 
-      <Carousel showStatus={false} infiniteLoop={true} autoPlay={false} renderThumbs={renderThumbs} >
+      <Carousel showStatus={false} infiniteLoop={true} autoPlay={false} renderThumbs={customRenderThumbs} >
         {carouselItems.map((item, index) => (
         <div key={index}>
           {item.type === "image" ? (
             <img src={item.src} alt={item.alt} />
           ) : (
             <ReactPlayer url={item.src} width="100%" height="100%" controls={true} />
-            //<img src={item.thumbnail} alt={item.alt} />
           )}
         </div>
         ))}
