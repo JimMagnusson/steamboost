@@ -1,10 +1,9 @@
 import { useState } from 'react'
 import React, { useEffect } from "react"
-import getStorePageDetails from '../services/steamAPIService'
 import { ReactSearchAutocomplete } from 'react-search-autocomplete'
 import steamAPIService from '../services/steamAPIService'
+import steamSpyAPIService from '../services/steamSpyAPIService'
 import GameList from '../components/GameList'
-import shortDescriptions from '../services/shortDescriptions'
 
 const steamGames = [
     {
@@ -93,12 +92,19 @@ const StorePageComparison = (props) => {
         .getStorePageDetails(results[i].appid)
         .then(steamGame => {
             if(steamGame != undefined) {
-              // Will show up in search bar suggestions
+
+              const videos = steamGame.movies.map(item => ({
+                src: item.mp4['480'],
+                thumbnail: item.thumbnail,
+              }))
+
               const suggestionObject = {
                 name: steamGame.name,
                 headerImage: steamGame.header_image,
-                tags: steamGame.genres.map(game => game.description),
-                shortDescription: steamGame.short_description
+                shortDescription: steamGame.short_description,
+                screenshots: steamGame.screenshots.map(item => item.path_thumbnail),
+                videos: videos,
+                id: steamGame.steam_appid
               }
 
               // Update suggestions state
@@ -131,15 +137,29 @@ const StorePageComparison = (props) => {
     // Add to selected games list
     const selectedSuggestion = suggestions.find((suggestion) => suggestion.name == item.name)
 
-    const selectedGameObject = {
-      id: selectedGames.length + 1,
+    let selectedGameObject = {
+      id: selectedSuggestion.id,
       image: selectedSuggestion.headerImage,
       title: selectedSuggestion.name,
-      tags: selectedSuggestion.tags,
-      description: selectedSuggestion.shortDescription
+      screenshots: selectedSuggestion.screenshots,
+      videos: selectedSuggestion.videos,
+      description: selectedSuggestion.shortDescription,
+      tags: []
     }
-    setSelectedGames(selectedGames.concat(selectedGameObject))
-    // Reset search variable
+
+    // API call to SteamSpy to get user defined tags
+    steamSpyAPIService.getTags(selectedSuggestion.id)
+    .then(tags => {
+        if(tags != undefined) {
+          const keys = Object.keys(tags);
+          selectedGameObject.tags = keys;
+          setSelectedGames(selectedGames.concat(selectedGameObject))
+        }
+        
+        
+    })
+    
+    // TODO: Reset search variable
 
   }
 
@@ -174,6 +194,11 @@ const StorePageComparison = (props) => {
     })
   }, [])
   
+  function handleOnRemoveClick(gameTitle) {
+    const newSelectedGames = selectedGames.filter((item) => gameTitle !== item.title)
+    setSelectedGames(newSelectedGames)
+  }
+
 
   return (
     <div>
@@ -189,7 +214,7 @@ const StorePageComparison = (props) => {
             autoFocus
           />
           <div className="App">
-            <GameList games = {selectedGames}/>
+            <GameList games = {selectedGames} onRemoveClick={handleOnRemoveClick}/>
           </div>
     </div>
   )
