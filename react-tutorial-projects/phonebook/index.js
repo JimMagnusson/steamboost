@@ -2,10 +2,43 @@ const express = require('express')
 const app = express()
 var morgan = require('morgan')
 const cors = require('cors')
+const mongoose = require('mongoose')
+
+
 
 app.use(express.json())
 app.use(morgan('tiny'))
 app.use(cors())
+
+
+
+const personSchema = new mongoose.Schema({
+  id: Number,
+  name: String,
+  number: Number,
+})
+
+personSchema.set('toJSON', {
+  transform: (document, returnedObject) => {
+    returnedObject.id = returnedObject._id.toString()
+    delete returnedObject._id
+    delete returnedObject.__v
+  }
+})
+
+const Person = mongoose.model('Person', personSchema)
+
+if (process.argv.length<3 ) {
+  console.log('give password')
+  process.exit(1)
+}
+
+const password = process.argv[2]
+
+const url = `mongodb+srv://jimmagnusson:${password}@cluster0.qw1m2ir.mongodb.net/phonebook?retryWrites=true&w=majority`
+
+mongoose.set('strictQuery',false)
+mongoose.connect(url)
 
 let persons = [
   { 
@@ -35,7 +68,12 @@ app.get('/', (request, response) => {
 })
   
 app.get('/api/persons', (request, response) => {
+  Person
+  .find({})
+  .then(persons => {
     response.json(persons)
+    mongoose.connection.close()
+  })
 })
 
 app.get('/info', (request, response) => {
