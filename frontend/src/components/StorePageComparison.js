@@ -5,6 +5,8 @@ import steamAPIService from '../services/steamAPIService'
 import steamSpyAPIService from '../services/steamSpyAPIService'
 import GameList from '../components/GameList'
 
+import axios from 'axios'
+
 const steamGames = [
     {
       id: 0,
@@ -185,12 +187,11 @@ const StorePageComparison = (props) => {
   }
 
   useEffect(() => {
-    steamAPIService
-    .getAllApps()
-    .then(games => {
-      // Add index field to all elements. Errors pop up otherwise.
-      games = games.map((item, index) => ({ ...item, id: index + 1 })) 
-      setAllGames(games)
+    axios
+    .post('http://localhost:3001/set-steam-games')
+    .then(response => {
+      console.log(response)
+      //setAllGames(response)
     })
   }, [])
   

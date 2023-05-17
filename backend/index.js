@@ -1,3 +1,5 @@
+
+const steamAPIService = require('./services/steamAPIService')
 const express = require('express')
 const cors = require('cors')
 const mongoose = require('mongoose')
@@ -14,6 +16,8 @@ const app = express()
 
 app.use(express.json())
 app.use(cors())
+
+const baseUrl = 'https://store.steampowered.com/api/appdetails?appids='
 
 
 // Schema for the database
@@ -49,10 +53,37 @@ app.get('/', (request, response) => {
 })
 
 app.post('/set-steam-games', async (request, response) => {
-  const body = request.body
+  try {
+    // Fetch all steam applications
+    const potentialGames = await steamAPIService.getAllApps();
+    
+    // Add index field to all elements. Errors pop up otherwise.
+    const gamesWithIds = potentialGames.map((item, index) => ({ ...item, id: index + 1 }));
+    const slicedGames = gamesWithIds.slice(0, 40); // For faster testing. TODO: remove
 
-  response.send('<h1>Set Steam Apps</h1>')
-})
+    const games = [];
+
+    // Check if a potential game is valid
+    await Promise.all(
+      slicedGames.map(async (element) => {
+        // Make network call for each game
+        const steamGame = await steamAPIService.getStorePageDetails(element.appid);
+        if (steamGame.success) {
+          games.push(steamGame.data);
+        }
+      })
+    );
+
+    // TODO: Store games list to the database
+    //await YourDatabaseService.storeGames(games); // Replace with your own implementation
+    
+    response.send(games);
+  } catch (error) {
+    // Handle and log any error
+    console.error(error);
+    response.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 
 app.get('/get-steam-games', (request, response) => {
