@@ -124,8 +124,6 @@ const StorePageComparison = (props) => {
             }
         })
     }
-    
-    
     // Show icon and name in the search bar by updating some state variables
   }
 
@@ -157,12 +155,8 @@ const StorePageComparison = (props) => {
           selectedGameObject.tags = keys;
           setSelectedGames(selectedGames.concat(selectedGameObject))
         }
-        
-        
     })
-    
     // TODO: Reset search variable
-
   }
 
   const handleOnFocus = () => {
@@ -171,7 +165,6 @@ const StorePageComparison = (props) => {
 
   const handleOnClear = () => {
     //console.log('Focused')
-
   }
 
   const formatResult = (item) => {

@@ -17,13 +17,9 @@ const app = express()
 app.use(express.json())
 app.use(cors())
 
-const baseUrl = 'https://store.steampowered.com/api/appdetails?appids='
-
-
-// Schema for the database
+// Schema for the database.
 const gameSchema = new mongoose.Schema({
-  id: Number,
-  name: String,
+  appID: Number,
 })
 
 /*
@@ -48,6 +44,7 @@ const url = `mongodb+srv://jimmagnusson:${password}@cluster0.qw1m2ir.mongodb.net
 mongoose.set('strictQuery',false)
 mongoose.connect(url)
 
+
 app.get('/', (request, response) => {
     response.send('<h1>Hello World!</h1>')
 })
@@ -59,23 +56,27 @@ app.post('/set-steam-games', async (request, response) => {
     
     // Add index field to all elements. Errors pop up otherwise.
     const gamesWithIds = potentialGames.map((item, index) => ({ ...item, id: index + 1 }));
-    const slicedGames = gamesWithIds.slice(0, 40); // For faster testing. TODO: remove
+    const slicedGames = gamesWithIds.slice(0, 100); // For faster testing. TODO: remove
+    
+    // Want to filter out all 'bad' entries in the list,
+    // remove those where the success flag is false.
+
+    const allAppIDs = slicedGames.map(item => item.appid);
 
     const games = [];
-
-    // Check if a potential game is valid
-    await Promise.all(
-      slicedGames.map(async (element) => {
-        // Make network call for each game
-        const steamGame = await steamAPIService.getStorePageDetails(element.appid);
-        if (steamGame.success) {
-          games.push(steamGame.data);
-        }
+    // Filter out all 'bad' entries ()
+    steamAPIService.getValidGameIDs(allAppIDs)
+      .then((validSteamGames) => {
+        // Save the valid entries on the database
+        console.log(validSteamGames)
       })
-    );
+      .catch((error) => {
+        console.error("Error:" + error)
+      })
 
-    // TODO: Store games list to the database
-    //await YourDatabaseService.storeGames(games); // Replace with your own implementation
+
+
+    // database.storeGames(games);
     
     response.send(games);
   } catch (error) {
@@ -97,8 +98,7 @@ app.get('/get-steam-games', (request, response) => {
 
 app.post('/add-steam-games', async (request, response) => {
   const game = new Game({
-    id: 0,
-    name: 'Valheim',
+    appID: 0,
   })
   game.save().then(result => {
     console.log('game saved!')
