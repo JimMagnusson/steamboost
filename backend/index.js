@@ -17,12 +17,16 @@ const app = express()
 app.use(express.json())
 app.use(cors())
 
-// Schema for the database.
+// Schema for the database. Want to have unique entries.
 const gameSchema = new mongoose.Schema({
-  appID: Number,
-})
+  appID: {
+    type: Number,
+    required: true,
+    unique: true
+  }
+}, { versionKey: false }); // Prevents the __v field in stored document
 
-/*
+
 gameSchema.set('toJSON', {
   transform: (document, returnedObject) => {
     returnedObject.id = returnedObject._id.toString()
@@ -30,7 +34,6 @@ gameSchema.set('toJSON', {
     delete returnedObject.__v
   }
 })
-*/
 const Game = mongoose.model('Game', gameSchema)
 
 if (process.argv.length<3 ) {
@@ -56,7 +59,7 @@ app.post('/set-steam-games', async (request, response) => {
     
     // Add index field to all elements. Errors pop up otherwise.
     const gamesWithIds = potentialGames.map((item, index) => ({ ...item, id: index + 1 }));
-    const slicedGames = gamesWithIds.slice(0, 100); // For faster testing. TODO: remove
+    const slicedGames = gamesWithIds.slice(0, 40); // For faster testing. TODO: remove
     
     // Want to filter out all 'bad' entries in the list,
     // remove those where the success flag is false.
@@ -65,20 +68,26 @@ app.post('/set-steam-games', async (request, response) => {
 
     const games = [];
     // Filter out all 'bad' entries ()
-    steamAPIService.getValidGameIDs(allAppIDs)
-      .then((validSteamGames) => {
-        // Save the valid entries on the database
-        console.log(validSteamGames)
-      })
-      .catch((error) => {
-        console.error("Error:" + error)
-      })
 
+    const validSteamGames = await steamAPIService.getValidGameIDs(allAppIDs);
 
+    for (const gameAppID of validSteamGames) {
+      const game = new Game({
+        appID: gameAppID,
+      });
+      try {
+        await game.save();
+        console.log('game saved!');
+      } catch (error) {
+        if (error.code === 11000) {
+          console.error(`Duplicate entry for appID: ${gameAppID}`);
+        } else {
+          console.error(error);
+        }
+      }
+    }
 
-    // database.storeGames(games);
-    
-    response.send(games);
+    response.send(validSteamGames);
   } catch (error) {
     // Handle and log any error
     console.error(error);
