@@ -23,7 +23,8 @@ const gameSchema = new mongoose.Schema({
     type: Number,
     required: true,
     unique: true
-  }
+  },
+  name: String
 }, { versionKey: false }); // Prevents the __v field in stored document
 
 
@@ -46,13 +47,22 @@ const url = `mongodb+srv://jimmagnusson:${password}@cluster0.qw1m2ir.mongodb.net
 
 mongoose.set('strictQuery',false)
 mongoose.connect(url)
+  .then(() => {
+    console.log('Connected to MongoDB');
+    // Check if the database creation argument is provided
+    const createDatabaseArg = process.argv.includes('--update-database');
+    if (createDatabaseArg) {
+      updateValidGamesCollection();
+    }
+  })
+  .catch(error => {
+    console.error('Failed to connect to MongoDB:', error);
+    process.exit(1);
+  });
 
 
-app.get('/', (request, response) => {
-    response.send('<h1>Hello World!</h1>')
-})
-
-app.post('/set-steam-games', async (request, response) => {
+// Saves valid game appIDs to database. Creates new collection if none exists.
+async function updateValidGamesCollection() { 
   try {
     // Fetch all steam applications
     const potentialGames = await steamAPIService.getAllApps();
@@ -66,34 +76,35 @@ app.post('/set-steam-games', async (request, response) => {
 
     const allAppIDs = slicedGames.map(item => item.appid);
 
-    const games = [];
     // Filter out all 'bad' entries ()
 
-    const validSteamGames = await steamAPIService.getValidGameIDs(allAppIDs);
-
-    for (const gameAppID of validSteamGames) {
+    const validSteamGames = await steamAPIService.getValidGames(allAppIDs);
+    let duplicateEntries = 0;
+    for (const gameElement of validSteamGames) {
       const game = new Game({
-        appID: gameAppID,
+        appID: gameElement.appID,
+        name: gameElement.name
       });
       try {
         await game.save();
-        console.log('game saved!');
       } catch (error) {
         if (error.code === 11000) {
-          console.error(`Duplicate entry for appID: ${gameAppID}`);
+          duplicateEntries++;
         } else {
           console.error(error);
         }
       }
     }
-
-    response.send(validSteamGames);
+    console.error(`New entries: ${validSteamGames.length-duplicateEntries}`);
   } catch (error) {
     // Handle and log any error
     console.error(error);
-    response.status(500).json({ error: 'Internal Server Error' });
   }
-});
+}
+
+app.get('/', (request, response) => {
+    response.send('<h1>Hello World!</h1>')
+})
 
 
 app.get('/get-steam-games', (request, response) => {

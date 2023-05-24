@@ -37,44 +37,6 @@ const steamGamesTest = [
   },
 ]
 
-const games = [
-  {
-    id: 1,
-    image: 'game1.jpg',
-    title: 'Game 1',
-    tags: ['Action'],
-    description: 'Description.'
-  },
-  {
-    id: 2,
-    image: 'game2.jpg',
-    title: 'Game 2',
-    tags: ['RPG', 'Fantasy'],
-    description: 'Description'
-  },
-  {
-    id: 3,
-    image: 'game3.jpg',
-    title: 'Game 3',
-    tags: ['Shooter'],
-    description: 'Description'
-  },
-  {
-    id: 4,
-    image: 'game4.jpg',
-    title: 'Game 4',
-    tags: ['Strategy'],
-    description: 'Description'
-  },
-  {
-    id: 5,
-    image: 'game5.jpg',
-    title: 'Game 5',
-    tags: ['Strategy'],
-    description: 'Description'
-  }
-];
-
 const StorePageComparison = (props) => {
   const [selectedGames, setSelectedGames] = useState([]);
   const [allGames, setAllGames] = useState([]);
@@ -91,7 +53,7 @@ const StorePageComparison = (props) => {
     if(results.length > 0){
       for(let i = 0; i < results.length; i++)
         steamAPIService
-        .getStorePageDetails(results[i].appid)
+        .getStorePageDetails(results[i].appID)
         .then(steamGame => {
             if(steamGame != undefined) {
 
@@ -181,10 +143,12 @@ const StorePageComparison = (props) => {
 
   useEffect(() => {
     axios
-    .post('http://localhost:3001/set-steam-games')
+    .get('http://localhost:3001/get-steam-games')
     .then(response => {
-      console.log(response)
-      //setAllGames(response)
+      let games = response.data;
+      // Add index field to all elements. Errors pop up otherwise.
+      games = games.map((item, index) => ({ ...item, id: index + 1 })) 
+      setAllGames(games)
     })
   }, [])
   
