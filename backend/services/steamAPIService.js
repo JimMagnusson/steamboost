@@ -20,13 +20,41 @@ const getValidGames = async potentialAppIDs => {
                 const validGames = [];
                 // Valid games are put in result.apps
                 for (let appid in result.apps) {
-                    const game = {
-                        appID: appid,
-                        name: result.apps[appid].appinfo.common.name,
-                    };
-                    validGames.push(game);
-                }
+                   
+                    
+                    const appinfo = result.apps[appid].appinfo;
+                    if(appinfo.hasOwnProperty("common")) {{
+                        // Debugging
+                        /*
+                        const gameName = result.apps[appid].appinfo.common.name;
+                        if(gameName == 'Havoc' || gameName == "Vacoo" || gameName == "AlphaBlue") {
+                            console.log(result.apps[appid].appinfo)
+                        }
+                        */
+                        
+                        let validGame = false;
+                        // Some testapps have only name and gameid fields, so need to check if field exist.
+                        if(appinfo.common.hasOwnProperty("releasestate")){
+                            // Some results have no store page, but no field specifies this.
+                            // They are usually prerelease games, or demos, so skip these.
+                            // Also skip types like DLC & Music for now to reduce the amount of games the search bar need to handle.
+                            if(appinfo.common.releasestate == "released" && appinfo.common.type == 'Game'){
+                                validGame = true;
+                            }
+                        }
 
+
+                        
+                        if(validGame) {
+                            const game = {
+                                appID: appid,
+                                name: appinfo.common.name,
+                            };
+                            validGames.push(game);
+                        }
+                    }}
+                    
+                }
                 console.log("Logging off of Steam");
                 client.logOff();
                 resolve(validGames); // Resolve the promise with the app info

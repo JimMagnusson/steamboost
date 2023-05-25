@@ -69,7 +69,7 @@ async function updateValidGamesCollection() {
     
     // Add index field to all elements. Errors pop up otherwise.
     const gamesWithIds = potentialGames.map((item, index) => ({ ...item, id: index + 1 }));
-    const slicedGames = gamesWithIds.slice(0, 40); // For faster testing. TODO: remove
+    const slicedGames = gamesWithIds.slice(0, 20000); // For faster testing. TODO: remove
     
     // Want to filter out all 'bad' entries in the list,
     // remove those where the success flag is false.
@@ -79,6 +79,7 @@ async function updateValidGamesCollection() {
     // Filter out all 'bad' entries ()
 
     const validSteamGames = await steamAPIService.getValidGames(allAppIDs);
+    
     let duplicateEntries = 0;
     for (const gameElement of validSteamGames) {
       const game = new Game({
@@ -95,7 +96,7 @@ async function updateValidGamesCollection() {
         }
       }
     }
-    console.error(`New entries: ${validSteamGames.length-duplicateEntries}`);
+    console.log(`New entries: ${validSteamGames.length-duplicateEntries}`);
   } catch (error) {
     // Handle and log any error
     console.error(error);
