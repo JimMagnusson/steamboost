@@ -20,17 +20,9 @@ const getValidGames = async potentialAppIDs => {
                 const validGames = [];
                 // Valid games are put in result.apps
                 for (let appid in result.apps) {
-                   
                     
                     const appinfo = result.apps[appid].appinfo;
                     if(appinfo.hasOwnProperty("common")) {{
-                        // Debugging
-                        /*
-                        const gameName = result.apps[appid].appinfo.common.name;
-                        if(gameName == 'Havoc' || gameName == "Vacoo" || gameName == "AlphaBlue") {
-                            console.log(result.apps[appid].appinfo)
-                        }
-                        */
                         
                         let validGame = false;
                         // Some testapps have only name and gameid fields, so need to check if field exist.

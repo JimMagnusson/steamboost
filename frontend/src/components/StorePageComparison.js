@@ -1,41 +1,11 @@
 import { useState } from 'react'
 import React, { useEffect } from "react"
 import { ReactSearchAutocomplete } from 'react-search-autocomplete'
-import steamAPIService from '../services/steamAPIService'
+import steamStoreAPIService from '../services/steamStoreAPIService'
 import steamSpyAPIService from '../services/steamSpyAPIService'
 import GameList from '../components/GameList'
 
 import axios from 'axios'
-
-const steamGames = [
-    {
-      id: 0,
-      name: "Valheim",
-      appID: 892970
-    },
-    {
-      id: 1,
-      name: "Baldurs Gate 3",
-      appID: 1086940
-    },
-    {
-      id: 2,
-      name: "Dota 2",
-      appID: 570
-    },
-
-  ];
-
-const steamGamesTest = [    
-  {
-    name: "Valheim",
-    appID: 892970
-  },
-  {
-    name: "Baldurs Gate 3",
-    appID: 1086940
-  },
-]
 
 const StorePageComparison = (props) => {
   const [selectedGames, setSelectedGames] = useState([]);
@@ -52,15 +22,18 @@ const StorePageComparison = (props) => {
     // Result of fuzzy search set in results. 
     if(results.length > 0){
       for(let i = 0; i < results.length; i++)
-        steamAPIService
+      steamStoreAPIService
         .getStorePageDetails(results[i].appID)
-        .then(steamGame => {
-            if(steamGame != undefined) {
-
-              const videos = steamGame.movies.map(item => ({
-                src: item.mp4['480'],
-                thumbnail: item.thumbnail,
-              }))
+        .then(response => {
+            if(response.success) {
+              const steamGame = response.data;
+              let videos = [];
+              if(steamGame.hasOwnProperty("movies")) {
+                videos = steamGame.movies.map(item => ({
+                  src: item.mp4['480'],
+                  thumbnail: item.thumbnail,
+                }))
+              }
 
               const suggestionObject = {
                 name: steamGame.name,
@@ -75,7 +48,7 @@ const StorePageComparison = (props) => {
               setSuggestions(prevState => {
                 // Add the new data to the the array
                 const newSuggestions = [...prevState, suggestionObject]
-
+                
                 if(newSuggestions.length > SUGGESTIONS_LIMIT) {
                   return newSuggestions.slice(1); // Remove old data
                 }
@@ -130,10 +103,10 @@ const StorePageComparison = (props) => {
   }
 
   const formatResult = (item) => {
-    const result = suggestions.find((suggestion) => suggestion.name == item.name)
+    const result = suggestions.find((suggestion) => suggestion.id == item.appID)
     return (
       <div>
-        <span> { result != undefined &&
+        <span> { result != undefined && // No image until response from store api is done
           <img src={result.headerImage} alt="Trees" height="80" />
           }
           {item.name}</span>
