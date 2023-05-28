@@ -69,12 +69,14 @@ async function updateValidGamesCollection() {
     
     // Add index field to all elements. Errors pop up otherwise.
     const gamesWithIds = potentialGames.map((item, index) => ({ ...item, id: index + 1 }));
-    const slicedGames = gamesWithIds.slice(0, 20000); // For faster testing. TODO: remove
     
+    // Comment out code below to only add some of the games. Useful when testing.
+    //const gamesWithIds = gamesWithIds.slice(0, 2000); 
+
     // Want to filter out all 'bad' entries in the list,
     // remove those where the success flag is false.
 
-    const allAppIDs = slicedGames.map(item => item.appid);
+    const allAppIDs = gamesWithIds.map(item => item.appid);
 
     // Filter out all 'bad' entries ()
 
