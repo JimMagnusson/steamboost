@@ -6,6 +6,8 @@ const getTags = appID => {
     return request.then(response => response.data.tags)
 }
 
-export default { 
+const steamSpyAPIService = {
     getTags: getTags
-}
+};
+  
+export default steamSpyAPIService;

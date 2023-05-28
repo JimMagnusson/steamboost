@@ -6,6 +6,8 @@ const getStorePageDetails = appID => {
     return request.then(response => response.data[appID])
 }
 
-export default { 
-    getStorePageDetails: getStorePageDetails, 
-}
+const steamStoreAPIService = {
+    getStorePageDetails: getStorePageDetails
+};
+  
+export default steamStoreAPIService;
