@@ -4,6 +4,7 @@ import { ReactSearchAutocomplete } from 'react-search-autocomplete'
 import steamStoreAPIService from '../services/steamStoreAPIService'
 import steamSpyAPIService from '../services/steamSpyAPIService'
 import GameList from '../components/GameList'
+import SharedTags from '../components/SharedTags'
 
 import axios from 'axios'
 
@@ -147,6 +148,10 @@ const StorePageComparison = (props) => {
           <div className="App">
             <GameList games = {selectedGames} onRemoveClick={handleOnRemoveClick}/>
           </div>
+          <div>
+            <SharedTags games = {selectedGames}></SharedTags>
+          </div>
+
     </div>
   )
 }
