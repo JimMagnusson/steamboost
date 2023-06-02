@@ -16,11 +16,8 @@ const StorePageComparison = (props) => {
   const SUGGESTIONS_LIMIT = 10;
 
   const handleOnSearch = (string, results) => {
-    // onSearch will have as the first callback parameter
-    // the string searched and for the second the results.
-    
-    // Ide: 
-    // Result of fuzzy search set in results. 
+    // Arguments: the string searched for and the results of the fuzzy search.
+
     if(results.length > 0){
       for(let i = 0; i < results.length; i++)
       steamStoreAPIService
@@ -55,23 +52,15 @@ const StorePageComparison = (props) => {
                 }
 
                 return newSuggestions
-              }
-              )
+              })
             }
         })
     }
-    // Show icon and name in the search bar by updating some state variables
-  }
-
-
-  const handleOnHover = (result) => {
-    // the item hovered
-    //console.log(result)
   }
 
   const handleOnSelect = (item) => {
     // Add to selected games list
-    const selectedSuggestion = suggestions.find((suggestion) => suggestion.name == item.name)
+    const selectedSuggestion = suggestions.find((suggestion) => suggestion.name === item.name)
 
     let selectedGameObject = {
       id: selectedSuggestion.id,
@@ -86,28 +75,19 @@ const StorePageComparison = (props) => {
     // API call to SteamSpy to get user defined tags
     steamSpyAPIService.getTags(selectedSuggestion.id)
     .then(tags => {
-        if(tags != undefined) {
+        if(tags !== undefined) {
           const keys = Object.keys(tags);
           selectedGameObject.tags = keys;
           setSelectedGames(selectedGames.concat(selectedGameObject))
         }
     })
-    // TODO: Reset search variable
-  }
-
-  const handleOnFocus = () => {
-    //console.log('Focused')
-  }
-
-  const handleOnClear = () => {
-    //console.log('Focused')
   }
 
   const formatResult = (item) => {
-    const result = suggestions.find((suggestion) => suggestion.id == item.appID)
+    const result = suggestions.find((suggestion) => suggestion.id === item.appID)
     return (
       <div>
-        <span> { result != undefined && // No image until response from store api is done
+        <span> { result !== undefined && // No image until response from store api is done
           <img src={result.headerImage} alt="Trees" height="80" />
           }
           {item.name}</span>
@@ -131,12 +111,16 @@ const StorePageComparison = (props) => {
     setSelectedGames(newSelectedGames)
   }
 
-
   return (
     <div>
-      <h2>Steam Store Page Comparison</h2>
-        <div style={{ marginBottom: 20 }}>Search for Steam Game:</div>
-
+      <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>
+        Steam Store Page Comparison
+      </h2>
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <div style={{ width: '400px' }}>
+          <div style={{ marginBottom: '20px', textAlign: 'center' }}>
+            Search for Steam Game:
+          </div>
           <ReactSearchAutocomplete
             items={allGames}
             onSearch={handleOnSearch}
@@ -145,15 +129,20 @@ const StorePageComparison = (props) => {
             formatResult={formatResult}
             autoFocus
           />
-          <div className="App">
-            <GameList games = {selectedGames} onRemoveClick={handleOnRemoveClick}/>
-          </div>
-          <div>
-            <SharedTags games = {selectedGames}></SharedTags>
-          </div>
-
+        </div>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <div className="App" style={{ maxWidth: '800px', marginTop: '20px' }}>
+          <GameList games={selectedGames} onRemoveClick={handleOnRemoveClick} />
+        </div>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <div style={{ maxWidth: '800px', marginTop: '20px' }}>
+          <SharedTags games={selectedGames} />
+        </div>
+      </div>
     </div>
-  )
+  );
 }
   
 export default StorePageComparison
