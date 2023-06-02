@@ -109,24 +109,20 @@ app.get('/', (request, response) => {
     response.send('<h1>Hello World!</h1>')
 })
 
-
 app.get('/get-steam-games', (request, response) => {
-  Game
-  .find({})
-  .then(games => {
-    response.json(games)
-    mongoose.connection.close()
+  mongoose.connect(url)
+  .then(() => {
+    Game
+    .find({})
+    .then(games => {
+      response.json(games)
+      mongoose.connection.close()
+    })
   })
-})
-
-app.post('/add-steam-games', async (request, response) => {
-  const game = new Game({
-    appID: 0,
-  })
-  game.save().then(result => {
-    console.log('game saved!')
-    mongoose.connection.close()
-  })
+  .catch(error => {
+    console.error('Failed to connect to MongoDB:', error);
+    process.exit(1);
+  });
 })
 
 app.post("/generate-short-description", async (request, response) => {

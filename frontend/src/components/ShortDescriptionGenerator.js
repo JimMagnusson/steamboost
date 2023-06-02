@@ -9,7 +9,6 @@ const ShortDescriptionGenerator = (props) => {
   const handleSendKeywords = (event) => {
     event.preventDefault()
     const lowerCaseKeywords = keywords.toLowerCase();
-    console.log(lowerCaseKeywords)
     const keywordsObject = {
       description: lowerCaseKeywords
     };
