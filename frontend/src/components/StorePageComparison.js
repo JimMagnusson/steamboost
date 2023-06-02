@@ -113,9 +113,14 @@ const StorePageComparison = (props) => {
 
   return (
     <div>
-      <h2>Steam Store Page Comparison</h2>
-        <div style={{ marginBottom: 20 }}>Search for Steam Game:</div>
-
+      <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>
+        Steam Store Page Comparison
+      </h2>
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <div style={{ width: '400px' }}>
+          <div style={{ marginBottom: '20px', textAlign: 'center' }}>
+            Search for Steam Game:
+          </div>
           <ReactSearchAutocomplete
             items={allGames}
             onSearch={handleOnSearch}
@@ -124,15 +129,20 @@ const StorePageComparison = (props) => {
             formatResult={formatResult}
             autoFocus
           />
-          <div className="App">
-            <GameList games = {selectedGames} onRemoveClick={handleOnRemoveClick}/>
-          </div>
-          <div>
-            <SharedTags games = {selectedGames}></SharedTags>
-          </div>
-
+        </div>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <div className="App" style={{ maxWidth: '800px', marginTop: '20px' }}>
+          <GameList games={selectedGames} onRemoveClick={handleOnRemoveClick} />
+        </div>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <div style={{ maxWidth: '800px', marginTop: '20px' }}>
+          <SharedTags games={selectedGames} />
+        </div>
+      </div>
     </div>
-  )
+  );
 }
   
 export default StorePageComparison
