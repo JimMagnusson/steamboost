@@ -18,6 +18,8 @@ const StorePageComparison = (props) => {
   const handleOnSearch = (string, results) => {
     // Arguments: the string searched for and the results of the fuzzy search.
 
+    // Currently only have appID + name. 
+    // Want to show cover image in search bar and later on also screenshots, videos, etc.
     if(results.length > 0){
       for(let i = 0; i < results.length; i++)
       steamStoreAPIService

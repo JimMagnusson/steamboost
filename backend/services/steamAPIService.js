@@ -1,6 +1,5 @@
 const axios = require('axios')
 const SteamUser = require('steam-user');
-const baseUrl = 'https://store.steampowered.com/api/appdetails?appids='
 const allAppsURL = 'http://api.steampowered.com/ISteamApps/GetAppList/v0002/'
 
 // Need to go via the steam API to handle the large number of requests
@@ -18,9 +17,10 @@ const getValidGames = async potentialAppIDs => {
                 console.log("Got app info:");
 
                 const validGames = [];
-                // Valid games are put in result.apps
+                // Valid games according to steam API are put in result.apps, so go through that
                 for (let appid in result.apps) {
                     
+                    // Filter, remove all unreleased games and applications that are not games
                     const appinfo = result.apps[appid].appinfo;
                     if(appinfo.hasOwnProperty("common")) {{
                         
@@ -58,17 +58,10 @@ const getValidGames = async potentialAppIDs => {
     });
 };
 
-
-const getStorePageDetails = appID => {
-    const request = axios.get(`${baseUrl}${appID}`)
-    return request.then(response => response.data[appID])
-}
-
 const getAllApps = () => {
     const request = axios.get(allAppsURL)
     return request.then(response => response.data.applist.apps)
 }
 
-exports.getStorePageDetails = getStorePageDetails
 exports.getAllApps = getAllApps
 exports.getValidGames = getValidGames

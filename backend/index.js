@@ -83,6 +83,8 @@ async function updateValidGamesCollection() {
     const validSteamGames = await steamAPIService.getValidGames(allAppIDs);
     
     let duplicateEntries = 0;
+
+    // Save the valid games on the database
     for (const gameElement of validSteamGames) {
       const game = new Game({
         appID: gameElement.appID,

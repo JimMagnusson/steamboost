@@ -51,14 +51,6 @@ function GameCard({ game, onRemoveClick }) {
     onRemoveClick(game.title)
   }
 
-  const sliderSettings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-  };
-
   const screenshots = game.screenshots.map((src) => ({
     src,
     alt: "Screenshot",
