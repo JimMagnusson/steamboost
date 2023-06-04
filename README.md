@@ -1,5 +1,10 @@
 # TDDD27 2023
 
+## Screencasts
+Demonstration screencast: https://youtu.be/fTEWSPHftYw
+
+Code screencast: https://youtu.be/aJ1RrM9F0-E
+
 ## Functional specification
 
 Project vision: To develop a tool for game developers to make the Steam store page setup process easier.
